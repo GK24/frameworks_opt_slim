@@ -157,15 +157,15 @@ public class ActionListViewSettings extends ListFragment implements
                 if (mDisableDeleteLastEntry && mActionConfigs.size() == 0) {
                     mActionConfigsAdapter.add(item);
                     showDialogInner(DLG_DELETION_NOT_ALLOWED, 0, false, false, false);
-                } else if (!ActionChecker.containsAction(
-                            mActivity, item, ActionConstants.ACTION_BACK)) {
-                    mTempActionConfig = item;
-                    showDialogInner(DLG_BACK_WARNING_DIALOG, which, false, false, false);
-                } else if (!ActionChecker.containsAction(
-                            mActivity, item, ActionConstants.ACTION_HOME)) {
-                    mTempActionConfig = item;
-                    showDialogInner(DLG_HOME_WARNING_DIALOG, which, false, false, false);
+
                 } else {
+                    if (!ActionChecker.containsAction(
+                            mActivity, item, ActionConstants.ACTION_BACK)) {
+                        showDialogInner(DLG_BACK_WARNING_DIALOG, 0, false, false, false);
+                    } else if (!ActionChecker.containsAction(
+                            mActivity, item, ActionConstants.ACTION_HOME)) {
+                        showDialogInner(DLG_HOME_WARNING_DIALOG, 0, false, false, false);
+                    }
                     setConfig(mActionConfigs, false);
                     deleteIconFileIfPresent(item, true);
                     if (mActionConfigs.size() == 0) {
@@ -183,8 +183,8 @@ public class ActionListViewSettings extends ListFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        return inflater.inflate(
-                org.slim.framework.R.layout.action_list_view_main, container, false);
+
+        return View.inflate(mContext, org.slim.framework.R.layout.action_list_view_main, null);
     }
 
     @Override
@@ -236,7 +236,8 @@ public class ActionListViewSettings extends ListFragment implements
         mActionConfigs = getConfig();
 
         if (mActionConfigs != null) {
-            mActionConfigsAdapter = new ActionConfigsAdapter(getContext(), mActionConfigs);
+
+            mActionConfigsAdapter = new ActionConfigsAdapter(mContext, mActionConfigs);
             setListAdapter(mActionConfigsAdapter);
             showDisableMessage(mActionConfigs.size() == 0);
         }
@@ -263,6 +264,7 @@ public class ActionListViewSettings extends ListFragment implements
                             mPendingNewAction = false;
                             mPicker.pickShortcut(getId());
                         }
+
                     }
                 return true;
             }
@@ -294,6 +296,37 @@ public class ActionListViewSettings extends ListFragment implements
                             mPendingNewAction = false;
                             mPicker.pickShortcut(getId());
                         }
+=======
+                    }
+                return true;
+            }
+
+            @Override
+            public boolean onSingleClick(int position) {
+                if (mUseFullAppsOnly) {
+                        if (mPicker != null) {
+                            mPendingIndex = position;
+                            mPendingLongpress = false;
+                            mPendingNewAction = false;
+                            mPicker.pickShortcut(getId(), true);
+                        }
+                    } else if (!mUseAppPickerOnly) {
+                        showDialogInner(DLG_SHOW_ACTION_DIALOG, position, false, false, false);
+                    } else {
+                        if (mPicker != null) {
+                            mPendingIndex = position;
+                            mPendingLongpress = false;
+                            mPendingNewAction = false;
+                            mPicker.pickShortcut(getId());
+                        }
+                    }
+                    if (!ActionChecker.containsAction(mActivity, mActionConfigs.get(position),
+                            ActionConstants.ACTION_BACK)) {
+                        showDialogInner(DLG_BACK_WARNING_DIALOG, 0, false, false, false);
+                    } else if (!ActionChecker.containsAction(
+                            mActivity, mActionConfigs.get(position), ActionConstants.ACTION_HOME)) {
+                        showDialogInner(DLG_HOME_WARNING_DIALOG, 0, false, false, false);
+>>>>>>> 297d0b5... SlimFramework: Fix remaining issues
                     }
                 return true;
             }
@@ -574,9 +607,10 @@ public class ActionListViewSettings extends ListFragment implements
         ActionConfig actionConfig = new ActionConfig(
             action, description,
             ActionConstants.ACTION_NULL,
-            getContext().getResources().getString(R.string.shortcut_action_none),
+
+            mContext.getResources().getString(R.string.shortcut_action_none),
             ActionConstants.ACTION_NULL,
-            getContext().getResources().getString(R.string.shortcut_action_none),
+            mContext.getResources().getString(R.string.shortcut_action_none),
             ActionConstants.ICON_EMPTY);
 
             mActionConfigsAdapter.add(actionConfig);
@@ -588,7 +622,7 @@ public class ActionListViewSettings extends ListFragment implements
         switch (mActionMode) {
             case NAV_BAR:
                 return ActionHelper.getNavBarConfigWithDescription(
-                    mActivity, mActionValuesKey, mActionEntriesKey);
+                    mContext, mActionValuesKey, mActionEntriesKey);
 /* Disabled for now till all features are back. Enable it step per step!!!!!!
             case POWER_MENU_SHORTCUT:
                 return ActionHelper.getPowerMenuConfigWithDescription(
@@ -654,7 +688,7 @@ public class ActionListViewSettings extends ListFragment implements
         }
 
         public View getView(final int position, View convertView, ViewGroup parent) {
-            View v = super.getView(position, convertView, parent);
+            View v = View.inflate(mContext, R.layout.action_list_view_item, null);
 
             if (v != convertView && v != null) {
                 ViewHolder holder = new ViewHolder();
