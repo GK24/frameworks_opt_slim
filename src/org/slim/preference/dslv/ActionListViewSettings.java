@@ -279,38 +279,6 @@ public class ActionListViewSettings extends ListFragment implements
                             mPicker.pickShortcut(getId(), true);
                         }
                     } else if (!mUseAppPickerOnly) {
-                        ActionConfig actionConfig = mActionConfigsAdapter.getItem(position);
-                        if (ActionConstants.ACTION_BACK.equals(
-                                actionConfig.getClickAction())) {
-                            showDialogInner(DLG_BACK_WARNING_DIALOG, position, false, false, true);
-                        } else if (ActionConstants.ACTION_HOME.equals(
-                                actionConfig.getClickAction())) {
-                            showDialogInner(DLG_HOME_WARNING_DIALOG, position, false, false, true);
-                        } else {
-                            showDialogInner(DLG_SHOW_ACTION_DIALOG, position, false, false, false);
-                        }
-                    } else {
-                        if (mPicker != null) {
-                            mPendingIndex = position;
-                            mPendingLongpress = false;
-                            mPendingNewAction = false;
-                            mPicker.pickShortcut(getId());
-                        }
-=======
-                    }
-                return true;
-            }
-
-            @Override
-            public boolean onSingleClick(int position) {
-                if (mUseFullAppsOnly) {
-                        if (mPicker != null) {
-                            mPendingIndex = position;
-                            mPendingLongpress = false;
-                            mPendingNewAction = false;
-                            mPicker.pickShortcut(getId(), true);
-                        }
-                    } else if (!mUseAppPickerOnly) {
                         showDialogInner(DLG_SHOW_ACTION_DIALOG, position, false, false, false);
                     } else {
                         if (mPicker != null) {
@@ -326,7 +294,6 @@ public class ActionListViewSettings extends ListFragment implements
                     } else if (!ActionChecker.containsAction(
                             mActivity, mActionConfigs.get(position), ActionConstants.ACTION_HOME)) {
                         showDialogInner(DLG_HOME_WARNING_DIALOG, 0, false, false, false);
->>>>>>> 297d0b5... SlimFramework: Fix remaining issues
                     }
                 return true;
             }
